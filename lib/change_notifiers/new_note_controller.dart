@@ -82,24 +82,36 @@ class NewNoteController extends ChangeNotifier {
     return canSave;
   }
 
-  void saveNote(BuildContext context) {
-    final String? newTitle = title.isNotEmpty ? title : null;
-    final String? newContent = content.toPlainText().trim().isNotEmpty
-        ? content.toPlainText().trim()
-        : null;
-    final String contentJson = jsonEncode(_content.toDelta().toJson());
-    final int now = DateTime.now().microsecondsSinceEpoch;
+  // In lib/change_notifiers/new_note_controller.dart
+  // Find the saveNote method and replace it with this:
 
-    final Note note = Note(
-      title: newTitle,
-      content: newContent,
-      contentJson: contentJson,
-      dateCreated: isNewNote ? now : _note!.dateCreated,
-      dateModified: now,
-      tags: tags,
-    );
+  // ONLY replace the saveNote method in your existing file
 
-    final notesProvider = context.read<NotesProvider>();
-    isNewNote ? notesProvider.addNote(note) : notesProvider.updateNote(note);
+void saveNote(BuildContext context) {
+  final String? newTitle = title.isNotEmpty ? title : null;
+  final String? newContent = content.toPlainText().trim().isNotEmpty
+      ? content.toPlainText().trim()
+      : null;
+  final String contentJson = jsonEncode(_content.toDelta().toJson());
+  final int now = DateTime.now().microsecondsSinceEpoch;
+
+  final Note note = Note(
+    id: _note?.id,
+    title: newTitle,
+    content: newContent,
+    contentJson: contentJson,
+    dateCreated: isNewNote ? now : _note!.dateCreated,
+    dateModified: now,
+    tags: tags,
+  );
+
+  // Make sure we get the provider correctly
+  final notesProvider = Provider.of<NotesProvider>(context, listen: false);
+  
+  if (isNewNote) {
+    notesProvider.addNote(note);
+  } else {
+    notesProvider.updateNote(note);
   }
+}
 }

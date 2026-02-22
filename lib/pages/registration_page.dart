@@ -27,11 +27,18 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   late final GlobalKey<FormState> formKey;
 
+  // In lib/pages/registration_page.dart
+  // In initState, change:
+
   @override
   void initState() {
     super.initState();
 
-    registrationController = context.read();
+    // Change this line:
+    // registrationController = context.read();
+    
+    // To this:
+    registrationController = Provider.of<RegistrationController>(context, listen: false);
 
     nameController = TextEditingController();
     emailController = TextEditingController();
@@ -232,8 +239,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               ),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  registrationController.isRegisterMode =
-                                      !isRegisterMode;
+                                  // Clear all text fields when switching modes
+                                  nameController.clear();
+                                  emailController.clear();
+                                  passwordController.clear();
+                                  
+                                  registrationController.isRegisterMode = !isRegisterMode;
                                 },
                             ),
                           ],

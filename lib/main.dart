@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_quill/flutter_quill.dart'; // Add this import
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:provider/provider.dart';
 
 import 'change_notifiers/notes_provider.dart';
@@ -49,23 +49,24 @@ class MyApp extends StatelessWidget {
                 ),
               ),
         ),
-        // Add these localizations delegates
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
-          FlutterQuillLocalizations.delegate, // Add this line
+          FlutterQuillLocalizations.delegate,
         ],
         supportedLocales: const [
-          Locale('en'), // English
-          // Add other locales as needed
+          Locale('en'),
         ],
         home: StreamBuilder<User?>(
           stream: AuthService.userStream,
           builder: (context, snapshot) {
-            return snapshot.hasData && AuthService.isEmailVerified
-                ? const MainPage()
-                : const RegistrationPage();
+            if (snapshot.hasData && AuthService.isEmailVerified) {
+              // ONLY CHANGE: Add this key to force rebuild on user change
+              return MainPage(key: ValueKey(snapshot.data!.uid));
+            } else {
+              return const RegistrationPage();
+            }
           },
         ),
       ),

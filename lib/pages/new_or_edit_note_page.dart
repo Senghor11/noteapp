@@ -35,29 +35,35 @@ class _NewOrEditNotePageState extends State<NewOrEditNotePage> {
   late final QuillController quillController;
   late final FocusNode focusNode;
 
+  // In lib/pages/new_or_edit_note_page.dart
+// Update the initState method
 
-@override
-  void initState() {
-    newNoteController =context.read<NewNoteController>();
-    titleController = TextEditingController(text: newNoteController.title);
+  @override
+void initState() {
+  super.initState();
 
-    focusNode = FocusNode();
-    quillController = QuillController.basic()
+  // Change this line to use Provider.of with listen: false
+  newNoteController = Provider.of<NewNoteController>(context, listen: false);
+
+  titleController = TextEditingController(text: newNoteController.title);
+
+  quillController = QuillController.basic()
     ..addListener(() {
       newNoteController.content = quillController.document;
     });
 
-  WidgetsBinding.instance.addPostFrameCallback((timestamp){
-    if(widget.isNewNote){
-          
-          focusNode.requestFocus();
-          newNoteController.readOnly = false;
-        }else{
-          newNoteController.readOnly = true;
-          quillController.document=newNoteController.content;
-        }
-    });
-  }
+  focusNode = FocusNode();
+
+  WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    if (widget.isNewNote) {
+      focusNode.requestFocus();
+      newNoteController.readOnly = false;
+    } else {
+      newNoteController.readOnly = true;
+      quillController.document = newNoteController.content;
+    }
+  });
+}
 
   @override
   void dispose() {

@@ -3,12 +3,35 @@ import 'package:flutter/material.dart';
 import '../enums/order_option.dart';
 import '../models/note.dart';
 import '../core/extensions.dart';
+import '../services/firestore_service.dart';
 
 class NotesProvider extends ChangeNotifier {
-  final List<Note> _notes = [];
+  final FirestoreService _firestoreService = FirestoreService();
+  List<Note> _notes = [];
+  
+  NotesProvider() {
+    print('🆕 NotesProvider created for new user');
+    _listenToNotes();
+  }
 
-  List<Note> get notes =>
-      [..._searchTerm.isEmpty ? _notes : _notes.where(_test)]..sort(_compare);
+  void _listenToNotes() {
+    _firestoreService.getNotes().listen((notes) {
+      _notes = notes;
+      notifyListeners();
+    }, onError: (error) {
+      print('Error listening to notes: $error');
+    });
+  }
+
+  List<Note> get notes {
+    if (_searchTerm.isEmpty) return _applySorting(_notes);
+    return _applySorting(_notes.where(_test).toList());
+  }
+
+  List<Note> _applySorting(List<Note> notes) {
+    notes.sort(_compare);
+    return notes;
+  }
 
   bool _test(Note note) {
     final term = _searchTerm.toLowerCase().trim();
@@ -20,7 +43,7 @@ class NotesProvider extends ChangeNotifier {
         tags.deepContains(term);
   }
 
-  int _compare(Note note1, note2) {
+  int _compare(Note note1, Note note2) {
     return _orderBy == OrderOption.dateModified
         ? _isDescending
             ? note2.dateModified.compareTo(note1.dateModified)
@@ -30,21 +53,18 @@ class NotesProvider extends ChangeNotifier {
             : note1.dateCreated.compareTo(note2.dateCreated);
   }
 
-  void addNote(Note note) {
-    _notes.add(note);
-    notifyListeners();
+  Future<void> addNote(Note note) async {
+    await _firestoreService.addNote(note);
   }
 
-  void updateNote(Note note) {
-    final index =
-        _notes.indexWhere((element) => element.dateCreated == note.dateCreated);
-    _notes[index] = note;
-    notifyListeners();
+  Future<void> updateNote(Note note) async {
+    await _firestoreService.updateNote(note);
   }
 
-  void deleteNote(Note note) {
-    _notes.remove(note);
-    notifyListeners();
+  Future<void> deleteNote(Note note) async {
+    if (note.id != null) {
+      await _firestoreService.deleteNote(note.id!);
+    }
   }
 
   OrderOption _orderBy = OrderOption.dateModified;
@@ -78,4 +98,10 @@ class NotesProvider extends ChangeNotifier {
   }
 
   String get searchTerm => _searchTerm;
+
+  @override
+  void dispose() {
+    print('🗑️ NotesProvider disposed');
+    super.dispose();
+  }
 }

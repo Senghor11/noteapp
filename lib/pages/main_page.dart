@@ -26,68 +26,71 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Awesome Notes 📒'),
-        actions: [
-          NoteIconButtonOutlined(
-            icon: FontAwesomeIcons.rightFromBracket,
-            onPressed: () async {
-              final bool shouldLogout = await showConfirmationDialog(
-                    context: context,
-                    title: 'Do you want to sign out of the app?',
-                  ) ??
-                  false;
-              if (shouldLogout) AuthService.logout();
-            },
-          ),
-        ],
-      ),
-      floatingActionButton: NoteFab(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChangeNotifierProvider(
-                create: (context) => NewNoteController(),
-                child: const NewOrEditNotePage(
-                  isNewNote: true,
+    return ChangeNotifierProvider(
+      create: (context) => NotesProvider(), // New instance for each user
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Awesome Notes 📒'),
+          actions: [
+            NoteIconButtonOutlined(
+              icon: FontAwesomeIcons.rightFromBracket,
+              onPressed: () async {
+                final bool shouldLogout = await showConfirmationDialog(
+                      context: context,
+                      title: 'Do you want to sign out of the app?',
+                    ) ??
+                    false;
+                if (shouldLogout) AuthService.logout();
+              },
+            ),
+          ],
+        ),
+        floatingActionButton: NoteFab(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChangeNotifierProvider(
+                  create: (context) => NewNoteController(),
+                  child: const NewOrEditNotePage(
+                    isNewNote: true,
+                  ),
                 ),
               ),
-            ),
-          );
-        },
-      ),
-      body: Consumer<NotesProvider>(
-        builder: (context, notesProvider, child) {
-          final List<Note> notes = notesProvider.notes;
-          return notes.isEmpty && notesProvider.searchTerm.isEmpty
-              ? const NoNotes()
-              : Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    children: [
-                      const SearchField(),
-                      if (notes.isNotEmpty) ...[
-                        const ViewOptions(),
-                        Expanded(
-                          child: notesProvider.isGrid
-                              ? NotesGrid(notes: notes)
-                              : NotesList(notes: notes),
-                        ),
-                      ] else
-                        const Expanded(
-                          child: Center(
-                            child: Text(
-                              'No notes found for your search query!',
-                              textAlign: TextAlign.center,
+            );
+          },
+        ),
+        body: Consumer<NotesProvider>(
+          builder: (context, notesProvider, child) {
+            final List<Note> notes = notesProvider.notes;
+            return notes.isEmpty && notesProvider.searchTerm.isEmpty
+                ? const NoNotes()
+                : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      children: [
+                        const SearchField(),
+                        if (notes.isNotEmpty) ...[
+                          const ViewOptions(),
+                          Expanded(
+                            child: notesProvider.isGrid
+                                ? NotesGrid(notes: notes)
+                                : NotesList(notes: notes),
+                          ),
+                        ] else
+                          const Expanded(
+                            child: Center(
+                              child: Text(
+                                'No notes found for your search query!',
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           ),
-                        ),
-                    ],
-                  ),
-                );
-        },
+                      ],
+                    ),
+                  );
+          },
+        ),
       ),
     );
   }
