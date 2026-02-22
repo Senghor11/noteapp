@@ -1,0 +1,256 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:noteapp/core/constants.dart';
+import 'package:noteapp/widgets/note_icon_button.dart';
+import '../widgets/note_icon_button_outlined.dart';
+
+class NewOrEditNotePage extends StatefulWidget {
+  const NewOrEditNotePage({
+    required this.isNewNote,
+    super.key});
+
+  final bool isNewNote;
+
+  @override
+  State<NewOrEditNotePage> createState() => _NewOrEditNotePageState();
+}
+
+class _NewOrEditNotePageState extends State<NewOrEditNotePage> {
+  final QuillController _controller = QuillController.basic();
+  late final FocusNode focusNode;
+  late bool readOnly;
+
+@override
+  void initState() {
+    focusNode = FocusNode();
+
+    if(widget.isNewNote){
+      
+      focusNode.requestFocus();
+      readOnly = false;
+    }else{
+      readOnly = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: NoteIconButtonOutlined(
+            onPressed: () {
+              Navigator.maybePop(context);
+            },
+            icon: FontAwesomeIcons.chevronLeft,
+          ),
+        ),
+        title: Text(widget.isNewNote ? 'New Note' : 'Edit Note'),
+        actions: [
+          NoteIconButtonOutlined(
+            onPressed: () {
+              setState(() {
+                readOnly = !readOnly;
+                
+                if(readOnly){
+                  FocusScope.of(context).unfocus();
+                  focusNode.unfocus();
+                }else{
+                  focusNode.requestFocus();
+                }
+              });
+            },
+            icon:readOnly ? FontAwesomeIcons.pen : FontAwesomeIcons.bookOpen,
+          ),
+          NoteIconButtonOutlined(
+            onPressed: () {},
+            icon: FontAwesomeIcons.check,
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            // Title TextField
+            TextField(
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Title here',
+                hintStyle: TextStyle(color: gray300),
+                border: InputBorder.none,
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Last modified row
+            if (!widget.isNewNote)
+            ...[
+            const Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Text(
+                    'Last modified',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: gray900,
+                    ),
+                  ),
+                ),
+                const Expanded(
+                  flex: 5,
+                  child: Text(
+                    '18 February 2026, 05:29 PM',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            // Created row
+            Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Text(
+                    'Created',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: gray900,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: Text(
+                    '20 May 2026, 10:29 PM',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            // Tags row
+            ],
+            Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Row(
+                    children: [
+                      Text(
+                        'Tags',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: gray900,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      NoteIconButton(
+                        onPressed: () {},
+                        icon: FontAwesomeIcons.circlePlus,
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: Text(
+                    'No Tag Added',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: gray900,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          
+            Padding(padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Divider(color: gray500,thickness: 2),
+            ),
+            
+            const SizedBox(height: 8),
+            Divider(color: gray500, thickness: 2),
+            const SizedBox(height: 8),
+            // Quill Toolbar
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 8),
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                color: white,
+                border: Border.all(color: primary,
+                 strokeAlign: BorderSide.strokeAlignOutside,),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: primary,
+                    offset: Offset(4, 4),
+                  ),
+
+                ],
+                
+              ),
+              child: QuillSimpleToolbar(
+                controller: _controller,
+                config: const QuillSimpleToolbarConfig(
+                  multiRowsDisplay: false,
+                  showFontFamily: false,
+                  showFontSize: false,
+                  showSubscript: false,
+                  showSuperscript: false,
+                  showSmallButton: false,
+                  showInlineCode: false,
+                  showAlignmentButtons: false,
+                  showDirection: false,
+                  showDividers: false,
+                  showHeaderStyle: false,
+                  showListCheck: false,
+                  showCodeBlock: false,
+                  showQuote: false,
+                  showIndent: false,
+                  showLink: false,
+              
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Quill Editor
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  border: Border.all(color: gray500, width: 2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: QuillEditor.basic(
+                  config: QuillEditorConfig(
+                    placeholder: 'Start writing your note here...',
+                    expands: true,
+                    
+                  ),
+                  focusNode: focusNode,
+                  controller: _controller,
+                ),
+              ),
+            ),
+            
+          ],
+        ),
+      ),
+    );
+  }
+}
