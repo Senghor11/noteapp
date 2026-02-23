@@ -255,6 +255,9 @@ https://iconscout.com/icons/firebase & https://iconscout.com/icons/flutter by ht
 My github
 https://github.com/Senghor11/noteapp.git
 
+Figma 
+https://www.figma.com/design/VOkc7JKxyKBRA0YkiP0XG9/Untitled?node-id=0-1&t=NFRWQtrWo9sRYOHq-1
+
 ### 📦 Dependencies
 
 ```yaml
