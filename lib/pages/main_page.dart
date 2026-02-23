@@ -30,7 +30,7 @@ class _MainPageState extends State<MainPage> {
       create: (context) => NotesProvider(), // New instance for each user
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Awesome Notes 📒'),
+          title: const Text('Notes App 📒'),
           actions: [
             NoteIconButtonOutlined(
               icon: FontAwesomeIcons.rightFromBracket,
