@@ -252,6 +252,9 @@ Icons used in the thumbnail
 https://iconscout.com/icons/firebase & https://iconscout.com/icons/flutter by https://iconscout.com/contributors/ic...
 
 
+My github
+https://github.com/Senghor11/noteapp.git
+
 ### 📦 Dependencies
 
 ```yaml
